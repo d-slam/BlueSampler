@@ -32,6 +32,7 @@ BlueSamplerAudioProcessor::BlueSamplerAudioProcessor()
 
 BlueSamplerAudioProcessor::~BlueSamplerAudioProcessor()
 {
+	mFormatReader->~AudioFormatReader();				//wtf ober assert werd net gschmissn
 	mFormatReader = nullptr;
 }
 
@@ -168,6 +169,8 @@ void BlueSamplerAudioProcessor::setStateInformation(const void* data, int sizeIn
 
 void BlueSamplerAudioProcessor::loadFile()
 {
+	mSampler.clearSounds();
+
 	FileChooser chooser{ "PLease File" };
 	if (chooser.browseForFileToOpen())
 	{
@@ -178,7 +181,20 @@ void BlueSamplerAudioProcessor::loadFile()
 	BigInteger range;
 	range.setRange(0, 128, true);
 
-	mSampler.addSound(new SamplerSound("Sampler", *mFormatReader, range, 60, 0.1, 0.1, 10));
+	mSampler.addSound(new SamplerSound("Sampler", *mFormatReader, range, 60, 0.1, 0.1, 10));	//kotzt assert, check tuts how to implement mit unique_ptr
+}
+void BlueSamplerAudioProcessor::loadFile(const String& path) 
+{
+	mSampler.clearSounds();
+
+	auto file = File(path);
+	mFormatReader = mFormatManager.createReaderFor(file);
+
+	BigInteger range;
+	range.setRange(0, 128, true);
+
+	mSampler.addSound(new SamplerSound("Sampler", *mFormatReader, range, 60, 0.1, 0.1, 10));		//same, funkt ober mit den bleedsinn in destructor
+
 }
 
 //==============================================================================
