@@ -30,6 +30,12 @@ public:
 private:
 
     TextButton mLoadButton { "Load" };
+    std::vector<float> mAudioPoints;
+    bool mShouldBePainting = false;
+
+    Slider mAttackSlider, mDecaySlider, mSustainSlider, mReleaseSlider;
+
+    Label mAttackLabel, mDecayLabel, mSustainLabel, mReleaseLabel;
 
     BlueSamplerAudioProcessor& audioProcessor;
 

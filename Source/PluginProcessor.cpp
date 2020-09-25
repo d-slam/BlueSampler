@@ -22,6 +22,8 @@ BlueSamplerAudioProcessor::BlueSamplerAudioProcessor()
 	)
 #endif
 {
+	mWaveForm.setSize(1, 0);				//WICHTIG!! suscht schreits assart wenn beim starten in editor in readpointer holsch!!!!
+
 	mFormatManager.registerBasicFormats();
 
 	for (int i = 0; i < mNumVoices; ++i)
@@ -32,7 +34,10 @@ BlueSamplerAudioProcessor::BlueSamplerAudioProcessor()
 
 BlueSamplerAudioProcessor::~BlueSamplerAudioProcessor()
 {
-	mFormatReader->~AudioFormatReader();				//wtf ober assert werd net gschmissn
+	if (mFormatReader != nullptr)					//wtf ober assert werd net gschmissn...ERST wenn >2 files gloden hosch Maulter...
+	{
+		mFormatReader->~AudioFormatReader();
+	}
 	mFormatReader = nullptr;
 }
 
@@ -181,14 +186,26 @@ void BlueSamplerAudioProcessor::loadFile()
 	BigInteger range;
 	range.setRange(0, 128, true);
 
-	mSampler.addSound(new SamplerSound("Sampler", *mFormatReader, range, 60, 0.1, 0.1, 10));	//kotzt assert, check tuts how to implement mit unique_ptr
+	mSampler.addSound(new SamplerSound("Sampler", *mFormatReader, range, 60, 0.1, 0.1, 10));	//rotzt assert, check tuts how to implement mit unique_ptr
 }
-void BlueSamplerAudioProcessor::loadFile(const String& path) 
+void BlueSamplerAudioProcessor::loadFile(const String& path)
 {
 	mSampler.clearSounds();
 
 	auto file = File(path);
 	mFormatReader = mFormatManager.createReaderFor(file);
+
+
+	auto sampleLenght = static_cast<int>(mFormatReader->lengthInSamples);						//potentieller channel assert
+	mWaveForm.setSize(1, sampleLenght);
+	mFormatReader->read(&mWaveForm, 0, sampleLenght, 0, true, false);
+
+			
+	//auto buffer = mWaveForm.getReadPointer(0);												//debug out
+	//for (int sample = 0; sample < mWaveForm.getNumSamples(); ++sample) 
+	//{
+	//	DBG(buffer[sample]);
+	//}
 
 	BigInteger range;
 	range.setRange(0, 128, true);
