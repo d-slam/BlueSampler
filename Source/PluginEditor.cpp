@@ -14,11 +14,14 @@ BlueSamplerAudioProcessorEditor::BlueSamplerAudioProcessorEditor(BlueSamplerAudi
 {
 	addAndMakeVisible(&mWaveThumbnail);
 	addAndMakeVisible(&mADSRComponent);
-
+	startTimer(50);
 	setSize(600, 400);
 }
 
-BlueSamplerAudioProcessorEditor::~BlueSamplerAudioProcessorEditor() {}
+BlueSamplerAudioProcessorEditor::~BlueSamplerAudioProcessorEditor() 
+{
+	stopTimer();
+}
 
 //==============================================================================
 void BlueSamplerAudioProcessorEditor::paint(juce::Graphics& g)
@@ -31,6 +34,11 @@ void BlueSamplerAudioProcessorEditor::resized()
 	mWaveThumbnail.setBoundsRelative(0.0f, 0.25f, 1.0f, 0.5f);
 
 	mADSRComponent.setBoundsRelative(0.0f, 0.75f, 1.0f, 0.25f);
+}
+
+void BlueSamplerAudioProcessorEditor::timerCallback()
+{
+	repaint();
 }
 
 

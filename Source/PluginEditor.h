@@ -16,7 +16,7 @@
 //==============================================================================
 /**
 */
-class BlueSamplerAudioProcessorEditor : public juce::AudioProcessorEditor
+class BlueSamplerAudioProcessorEditor : public juce::AudioProcessorEditor, public Timer
 {
 public:
 	BlueSamplerAudioProcessorEditor(BlueSamplerAudioProcessor&);
@@ -25,6 +25,8 @@ public:
 	//==============================================================================
 	void paint(juce::Graphics&) override;
 	void resized() override;
+
+	void timerCallback() override;
 
 private:
 	WaveThumbnail mWaveThumbnail;
