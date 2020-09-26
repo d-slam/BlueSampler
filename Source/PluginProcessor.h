@@ -13,7 +13,7 @@
 //==============================================================================
 /**
 */
-class BlueSamplerAudioProcessor : public juce::AudioProcessor
+class BlueSamplerAudioProcessor : public juce::AudioProcessor, public ValueTree::Listener
 {
 public:
 	//==============================================================================
@@ -62,6 +62,7 @@ public:
 	void updateADSR();
 
 	ADSR::Parameters& getADSRParams() { return mADSRParams; };
+	AudioProcessorValueTreeState& getAPVTS() { return mAPVTS; };
 
 	float attack{ 0.0f };
 	float decay{ 0.0f };
@@ -77,10 +78,17 @@ private:
 	const int mNumVoices{ 3 };
 	AudioBuffer<float> mWaveForm;
 
-	ADSR::Parameters mADSRParams;
-
 	AudioFormatManager mFormatManager;
 	AudioFormatReader* mFormatReader{ nullptr };
+
+
+	ADSR::Parameters mADSRParams;
+	AudioProcessorValueTreeState mAPVTS;
+	AudioProcessorValueTreeState::ParameterLayout createParameters();
+
+	void valueTreePropertyChanged(ValueTree& treeWhoesPropertyChanged, const Identifier& property)override;
+
+	std::atomic<bool> mShouldUpdate{ false };
 
 
 	//==============================================================================

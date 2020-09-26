@@ -18,30 +18,29 @@ BlueSamplerAudioProcessorEditor::BlueSamplerAudioProcessorEditor(BlueSamplerAudi
 	mAttackSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	mAttackSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
 	mAttackSlider.setColour(Slider::ColourIds::thumbColourId, Colours::blue);
-	mAttackSlider.setRange(0.0f, 5.0f, 0.01f);
-	mAttackSlider.addListener(this);
 	addAndMakeVisible(&mAttackSlider);
+	mAttackAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "ATTACK", mAttackSlider);
 
 	mDecaySlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	mDecaySlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
 	mDecaySlider.setColour(Slider::ColourIds::thumbColourId, Colours::blue);
-	mDecaySlider.setRange(0.0f, 5.0f, 0.01f);
-	mDecaySlider.addListener(this);
 	addAndMakeVisible(&mDecaySlider);
+	mDecayAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "DECAY", mDecaySlider);
+
 
 	mSustainSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	mSustainSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
 	mSustainSlider.setColour(Slider::ColourIds::thumbColourId, Colours::blue);
-	mSustainSlider.setRange(0.0f, 1.0f, 0.01f);
-	mSustainSlider.addListener(this);
 	addAndMakeVisible(&mSustainSlider);
+	mSustainAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "SUSTAIN", mSustainSlider);
+
 
 	mReleaseSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	mReleaseSlider.setTextBoxStyle(Slider::TextBoxBelow, false, 40, 20);
 	mReleaseSlider.setColour(Slider::ColourIds::thumbColourId, Colours::blue);
-	mReleaseSlider.setRange(0.0f, 5.0f, 0.01f);
-	mReleaseSlider.addListener(this);
 	addAndMakeVisible(&mReleaseSlider);
+	mReleaseAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.getAPVTS(), "RELEASE", mReleaseSlider);
+
 
 	mAttackLabel.setFont(16.0f);
 	mAttackLabel.setText("Attack", dontSendNotification);
@@ -167,26 +166,4 @@ void BlueSamplerAudioProcessorEditor::filesDropped(const StringArray& files, int
 	repaint();
 }
 
-void BlueSamplerAudioProcessorEditor::sliderValueChanged(Slider* slider)
-{
-	if (slider == &mAttackSlider) 
-	{
-		audioProcessor.getADSRParams().attack = mAttackSlider.getValue();
-	}
-	else if(slider == &mDecaySlider)
-	{
-		audioProcessor.getADSRParams().decay = mDecaySlider.getValue();
 
-	}
-	else if (slider == &mSustainSlider)
-	{
-		audioProcessor.getADSRParams().sustain = mSustainSlider.getValue();
-		;
-	}
-	else if (slider == &mReleaseSlider)
-	{
-		audioProcessor.getADSRParams().release = mReleaseSlider.getValue();
-
-	}
-	audioProcessor.updateADSR();
-}
