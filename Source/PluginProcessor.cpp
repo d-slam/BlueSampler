@@ -19,12 +19,16 @@ BlueSamplerAudioProcessor::BlueSamplerAudioProcessor()
 #endif
 		.withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-	)
+	), mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
+
+
 #endif
 {
 	mWaveForm.setSize(1, 0);				//WICHTIG!! suscht schreits assart wenn beim starten in editor in readpointer holsch!!!!
 
 	mFormatManager.registerBasicFormats();
+
+	mAPVTS.state.addListener(this);
 
 	for (int i = 0; i < mNumVoices; ++i)
 	{
@@ -144,6 +148,10 @@ void BlueSamplerAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 	auto totalNumInputChannels = getTotalNumInputChannels();
 	auto totalNumOutputChannels = getTotalNumOutputChannels();
 
+	if (mShouldUpdate)
+	{
+		updateADSR();
+	}
 
 	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
 		buffer.clear(i, 0, buffer.getNumSamples());
@@ -202,7 +210,7 @@ void BlueSamplerAudioProcessor::loadFile(const String& path)
 	mWaveForm.setSize(1, sampleLenght);
 	mFormatReader->read(&mWaveForm, 0, sampleLenght, 0, true, false);
 
-			
+
 	//auto buffer = mWaveForm.getReadPointer(0);												//debug out
 	//for (int sample = 0; sample < mWaveForm.getNumSamples(); ++sample) 
 	//{
@@ -214,10 +222,19 @@ void BlueSamplerAudioProcessor::loadFile(const String& path)
 
 	mSampler.addSound(new SamplerSound("Sampler", *mFormatReader, range, 60, 0.1, 0.1, 10));		//same, funkt ober mit den bleedsinn in destructor
 
+	updateADSR();
+
 }
 
 void BlueSamplerAudioProcessor::updateADSR()
 {
+
+	mADSRParams.attack = mAPVTS.getRawParameterValue("ATTACK")->load();
+	mADSRParams.decay = mAPVTS.getRawParameterValue("DECAY")->load();
+	mADSRParams.sustain = mAPVTS.getRawParameterValue("SUSTAIN")->load();
+	mADSRParams.release = mAPVTS.getRawParameterValue("RELEASE")->load();
+
+
 	//DBG("Attack " << attack << "decay " << decay << "sustain " << sustain << "release " << release);
 	for (int i = 0; i < mSampler.getNumSounds(); ++i)
 	{
@@ -229,9 +246,33 @@ void BlueSamplerAudioProcessor::updateADSR()
 	}
 }
 
+
+AudioProcessorValueTreeState::ParameterLayout BlueSamplerAudioProcessor::createParameters()
+{
+	std::vector<std::unique_ptr<RangedAudioParameter>> parameters;
+
+	parameters.push_back(std::make_unique<AudioParameterFloat>("ATTACK", "Attack", 0.0f, 5.0f, 0.0f));
+	parameters.push_back(std::make_unique<AudioParameterFloat>("DECAY", "Decay", 0.0f, 3.0f, 2.0f));
+	parameters.push_back(std::make_unique<AudioParameterFloat>("SUSTAIN", "Sustain", 0.0f, 1.0f, 1.0f));
+	parameters.push_back(std::make_unique<AudioParameterFloat>("RELEASE", "Release", 0.0f, 5.0f, 2.0f));
+
+
+	return { parameters.begin(),parameters.end() };
+}
+
+void BlueSamplerAudioProcessor::valueTreePropertyChanged(ValueTree& treeWhoesPropertyChanged, const Identifier& property)
+{
+	mShouldUpdate = true;
+}
+
+
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
 	return new BlueSamplerAudioProcessor();
 }
+
+
+
