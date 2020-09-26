@@ -105,6 +105,8 @@ void BlueSamplerAudioProcessor::changeProgramName(int index, const juce::String&
 void BlueSamplerAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
 	mSampler.setCurrentPlaybackSampleRate(sampleRate);
+
+	updateADSR();
 }
 
 void BlueSamplerAudioProcessor::releaseResources()
@@ -141,8 +143,6 @@ void BlueSamplerAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 	juce::ScopedNoDenormals noDenormals;
 	auto totalNumInputChannels = getTotalNumInputChannels();
 	auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-	getADSRValue();
 
 
 	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
@@ -216,9 +216,17 @@ void BlueSamplerAudioProcessor::loadFile(const String& path)
 
 }
 
-void BlueSamplerAudioProcessor::getADSRValue()
+void BlueSamplerAudioProcessor::updateADSR()
 {
-	DBG("Attack " << attack << "decay " << decay << "sustain " << sustain << "release " << release);
+	//DBG("Attack " << attack << "decay " << decay << "sustain " << sustain << "release " << release);
+	for (int i = 0; i < mSampler.getNumSounds(); ++i)
+	{
+		if (auto sound = dynamic_cast<SamplerSound*>(mSampler.getSound(i).get()));
+		{
+			auto sound = dynamic_cast<SamplerSound*>(mSampler.getSound(i).get());				//scheint ausn scope zu sein, donn castmor holt nomol
+			sound->setEnvelopeParameters(mADSRParams);
+		}
+	}
 }
 
 //==============================================================================
