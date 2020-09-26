@@ -69,9 +69,6 @@ public:
 	float sustain{ 0.0f };
 	float release{ 0.0f };
 
-
-
-
 private:
 
 	Synthesiser mSampler;
