@@ -50,7 +50,6 @@ const juce::String BlueSamplerAudioProcessor::getName() const
 {
 	return JucePlugin_Name;
 }
-
 bool BlueSamplerAudioProcessor::acceptsMidi() const
 {
 #if JucePlugin_WantsMidiInput
@@ -59,7 +58,6 @@ bool BlueSamplerAudioProcessor::acceptsMidi() const
 	return false;
 #endif
 }
-
 bool BlueSamplerAudioProcessor::producesMidi() const
 {
 #if JucePlugin_ProducesMidiOutput
@@ -68,7 +66,6 @@ bool BlueSamplerAudioProcessor::producesMidi() const
 	return false;
 #endif
 }
-
 bool BlueSamplerAudioProcessor::isMidiEffect() const
 {
 #if JucePlugin_IsMidiEffect
@@ -77,34 +74,27 @@ bool BlueSamplerAudioProcessor::isMidiEffect() const
 	return false;
 #endif
 }
-
 double BlueSamplerAudioProcessor::getTailLengthSeconds() const
 {
 	return 0.0;
 }
-
 int BlueSamplerAudioProcessor::getNumPrograms()
 {
 	return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
 				// so this should be at least 1, even if you're not really implementing programs.
 }
-
 int BlueSamplerAudioProcessor::getCurrentProgram()
 {
 	return 0;
 }
-
 void BlueSamplerAudioProcessor::setCurrentProgram(int index)
 {}
-
 const juce::String BlueSamplerAudioProcessor::getProgramName(int index)
 {
 	return {};
 }
-
 void BlueSamplerAudioProcessor::changeProgramName(int index, const juce::String& newName)
 {}
-
 //==============================================================================
 void BlueSamplerAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
@@ -147,14 +137,29 @@ void BlueSamplerAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 	juce::ScopedNoDenormals noDenormals;
 	auto totalNumInputChannels = getTotalNumInputChannels();
 	auto totalNumOutputChannels = getTotalNumOutputChannels();
+	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+		buffer.clear(i, 0, buffer.getNumSamples());
 
 	if (mShouldUpdate)
 	{
 		updateADSR();
 	}
 
-	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-		buffer.clear(i, 0, buffer.getNumSamples());
+
+	MidiMessage m;
+	MidiBuffer::Iterator it{ midiMessages };
+	int sample;
+	while (it.getNextEvent(m, sample))
+	{
+		if (m.isNoteOn())
+			mIsNotePlayed = true;
+
+		else if (m.isNoteOff())
+			mIsNotePlayed = false;
+	}
+
+	mSampleCount = mIsNotePlayed ? mSampleCount += buffer.getNumSamples() : 0;				//verkürtzt if statement(if mIsNotePlayed than inc... des nochn : isch es else (mSampleCount=0)
+
 
 	mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
@@ -176,7 +181,6 @@ void BlueSamplerAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
 
 }
-
 void BlueSamplerAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
 

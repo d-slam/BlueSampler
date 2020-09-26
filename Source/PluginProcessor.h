@@ -64,10 +64,10 @@ public:
 	ADSR::Parameters& getADSRParams() { return mADSRParams; };
 	AudioProcessorValueTreeState& getAPVTS() { return mAPVTS; };
 
-	float attack{ 0.0f };
-	float decay{ 0.0f };
-	float sustain{ 0.0f };
-	float release{ 0.0f };
+	std::atomic<bool>& isNotePlayed() { return mIsNotePlayed; }
+	std::atomic<int>& getSampleCount() { return mSampleCount; }
+
+
 
 private:
 
@@ -86,6 +86,8 @@ private:
 	void valueTreePropertyChanged(ValueTree& treeWhoesPropertyChanged, const Identifier& property)override;
 
 	std::atomic<bool> mShouldUpdate{ false };
+	std::atomic<bool> mIsNotePlayed{ false };
+	std::atomic<int> mSampleCount{ 0 };
 
 
 	//==============================================================================
