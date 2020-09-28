@@ -12,6 +12,15 @@
       <FILE id="YPmqjO" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="mY3wtB" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="WWZdMM" name="WaveThumbnail.cpp" compile="1" resource="0"
+            file="Source/WaveThumbnail.cpp"/>
+      <FILE id="VC9UkD" name="WaveThumbnail.h" compile="0" resource="0" file="Source/WaveThumbnail.h"/>
+      <FILE id="zkPDjH" name="ADSRComponent.cpp" compile="1" resource="0"
+            file="Source/ADSRComponent.cpp"/>
+      <FILE id="CSyXBB" name="ADSRComponent.h" compile="0" resource="0" file="Source/ADSRComponent.h"/>
+    </GROUP>
+    <GROUP id="{B4FD04B4-2368-5ACC-8089-09C9F10F3C5A}" name="Resources">
+      <FILE id="Fm7fI3" name="logo.png" compile="0" resource="1" file="Resources/logo.png"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

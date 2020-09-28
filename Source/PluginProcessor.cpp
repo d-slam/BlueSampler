@@ -158,7 +158,7 @@ void BlueSamplerAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 			mIsNotePlayed = false;
 	}
 
-	mSampleCount = mIsNotePlayed ? mSampleCount += buffer.getNumSamples() : 0;				//verkürtzt if statement(if mIsNotePlayed than inc... des nochn : isch es else (mSampleCount=0)
+	mSampleCount = mIsNotePlayed ? mSampleCount += buffer.getNumSamples() : 0;				//verkÃ¼rtzt if statement(if mIsNotePlayed than inc... des nochn : isch es else (mSampleCount=0)
 
 
 	mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
