@@ -29,6 +29,8 @@ public:
 	void timerCallback() override;
 
 private:
+
+	ImageComponent mImageComponent;
 	WaveThumbnail mWaveThumbnail;
 	ADSRComponent mADSRComponent;
 
